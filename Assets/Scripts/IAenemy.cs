@@ -8,7 +8,8 @@ public class IAenemy : MonoBehaviour
     enum State
     {
         Patrolling,
-        Chasing
+        Chasing,
+        Searching
     }
 
     State currentState;
@@ -21,6 +22,12 @@ public class IAenemy : MonoBehaviour
 
     [SerializeField] float visionRange = 15;
     [SerializeField] float visionAngle = 90;
+
+    Vector3 lastTargetPosition;
+
+    float searchTimer;
+    [SerializeField]float searchWaitTime = 15;
+    [SerializeField]float searchRadius = 30;
 
     // Start is called before the first frame update
     void Awake()
@@ -45,6 +52,10 @@ public class IAenemy : MonoBehaviour
 
             case State.Chasing:
                 Chase();
+            break;
+
+            case State.Searching:
+                Search();
             break;
         }
     }
@@ -72,6 +83,16 @@ public class IAenemy : MonoBehaviour
         }
     }
 
+    void Search()
+    {
+        searchTimer += Time.deltaTime;
+
+        if(searchTimer < searchWaitTime)
+        {
+
+        }
+    }
+
     void SetRandomPoint()
     {
         float randomX = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
@@ -95,12 +116,17 @@ public class IAenemy : MonoBehaviour
 
        if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.5f)
        {
-        //return true;
+        if(playerTransform.position == lastTargetPosition)
+        {
+            return true;
+        }
+
         RaycastHit hit;
         if(Physics.Raycast(transform.position, directionToPlayer, out hit, distanceToPlayer))
         {
             if(hit.collider.CompareTag("Player"))
             {
+                lastTargetPosition = playerTransform.position;
                 return true;
             }
         }
