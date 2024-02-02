@@ -89,7 +89,7 @@ public class IAenemy : MonoBehaviour
 
         if(searchTimer < searchWaitTime)
         {
-            Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitySphere * searchRadius;
+            Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitSphere * searchRadius;
         }
     }
 
