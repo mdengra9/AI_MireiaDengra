@@ -95,7 +95,16 @@ public class IAenemy : MonoBehaviour
 
        if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.5f)
        {
-        return true;
+        //return true;
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position, directionToPlayer, out hit, distanceToPlayer))
+        {
+            if(hit.collider.CompareTag("Player"))
+            {
+                return true;
+            }
+        }
+        return false;
        }
        return false;
     }
