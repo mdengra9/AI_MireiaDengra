@@ -9,7 +9,9 @@ public class IAenemy : MonoBehaviour
     {
         Patrolling,
         Chasing,
-        Searching
+        Searching,
+        Waiting,
+        Atacking
     }
 
     State currentState;
@@ -57,6 +59,14 @@ public class IAenemy : MonoBehaviour
             case State.Searching:
                 Search();
             break;
+
+            case State.Waiting:
+                Wait();
+            break;
+
+            case State.Atacking:
+                Atack();
+            break;
         }
     }
 
@@ -79,6 +89,7 @@ public class IAenemy : MonoBehaviour
 
         if(OnRange() == false)
         {
+            searchTimer = 0;
             currentState = State.Searching;
         }
     }
@@ -89,7 +100,7 @@ public class IAenemy : MonoBehaviour
         {
             currentState = State.Chasing;
         }
-        
+
         searchTimer += Time.deltaTime;
 
         if(searchTimer < searchWaitTime)
@@ -99,10 +110,9 @@ public class IAenemy : MonoBehaviour
                 Debug.Log("Buscando punto aleatorio");
 
                 Vector3 randomSearchPoint = lastTargetPosition + Random.insideUnitSphere * searchRadius;
-                randomSearchPoint.y = 0f;
+                randomSearchPoint.y = lastTargetPosition.y;
                 enemyAgent.destination = randomSearchPoint;  
             }
-            
         }
         else
         {
