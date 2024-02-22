@@ -9,9 +9,9 @@ public class IAenemy : MonoBehaviour
     {
         Patrolling,
         Chasing,
-        Searching,
+        //Searching,
         Waiting,
-        Atacking
+        Attacking
     }
 
     State currentState;
@@ -31,10 +31,18 @@ public class IAenemy : MonoBehaviour
     [SerializeField]float searchWaitTime = 15;
     [SerializeField]float searchRadius = 30;
 
+    private float waitTime = 5f;
+    float timer;
+
+    public List<Transform> pointList;
+    int currentPoint;
+
     // Start is called before the first frame update
     void Awake()
     {
+        currentPoint = 0;
         enemyAgent = GetComponent<NavMeshAgent>();
+        enemyAgent.destination = pointList[currentPoint].position;
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
@@ -56,22 +64,23 @@ public class IAenemy : MonoBehaviour
                 Chase();
             break;
 
-            case State.Searching:
+            /*case State.Searching:
                 Search();
-            break;
+            break;*/
 
             case State.Waiting:
                 Wait();
             break;
 
-            case State.Atacking:
-                Atack();
+            case State.Attacking:
+                Attack();
             break;
         }
     }
 
     void Patrol()
     {
+        enemyAgent.destination = pointList[currentPoint].position;
         if(OnRange() == true)
         {
             currentState = State.Chasing;
@@ -79,7 +88,7 @@ public class IAenemy : MonoBehaviour
 
         if(enemyAgent.remainingDistance < 0.5f)
         {
-            SetRandomPoint();
+            currentState = State.Waiting;
         }
     }
 
@@ -87,14 +96,52 @@ public class IAenemy : MonoBehaviour
     {
         enemyAgent.destination = playerTransform.position;
 
+        if(enemyAgent.remainingDistance < 1.5f)
+        {
+            currentState = State.Attacking;
+        }
+
         if(OnRange() == false)
         {
             searchTimer = 0;
-            currentState = State.Searching;
+            //currentState = State.Searching;
         }
     }
 
-    void Search()
+    void Wait()
+    {
+        timer += Time.deltaTime;
+
+         if(OnRange()== true)
+        {
+            currentState = State.Chasing;
+            timer = 0;
+        }
+
+        if(timer >= waitTime)
+        {
+            if(currentPoint < 3)
+            {
+                currentPoint++;
+            }
+            else
+            {
+                currentPoint = 0;
+            }
+
+            timer = 0;
+
+            currentState = State.Patrolling;
+        }
+    }
+
+    void Attack()
+    {
+        Debug.Log("Te atacoooo");
+        currentState = State.Chasing;   
+    }
+
+    /*void Search()
     {
         if(OnRange() == true)
         {
@@ -118,7 +165,7 @@ public class IAenemy : MonoBehaviour
         {
             currentState = State.Patrolling;
         }
-    }
+    }*/
 
     void SetRandomPoint()
     {
